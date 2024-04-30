@@ -1,0 +1,77 @@
+{% extends 'register/base.html' %}
+{% load static %}
+
+{% block title %}
+Request Points
+{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container-fluid" style="min-height: 100vh;">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <a class="btn btn-secondary mb-3" onclick="goBack()">Back</a> <!-- Back button -->
+            </div>
+        </div>
+
+        <h4>Request Points</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <form method="post" class="form-group">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-success mt-3">Transfer</button>
+                </form>
+            </div>
+        </div>
+
+        <h2 class="mb-4">Points Request</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                <tr>
+                    <th>Sender</th>
+                    <th>Receiver</th>
+                    <th>Points Request</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in point_detail %}
+                <tr>
+                    <td>{{ i.enter_your_username }}</td>
+                    <td>{{ i.enter_destination_username }}</td>
+                    <td>{{ i.enter_points_to_transfer|floatformat:2 }} {{ i.points_type }}</td>
+                    <td>{{ i.transfer_status }}</td>
+                    <td>{{ i.date_time }}</td>
+                    <td>
+                        {% if i.transfer_status == 'Pending' and i.enter_your_username != user %}
+                        <form method="post" action="{% url 'accept_request' i.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success mr-2">Accept</button>
+                        </form>
+                        <form method="post" action="{% url 'reject_request' i.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function goBack() {
+        window.history.back(); // JavaScript function to navigate back
+    }
+</script>
+{% endblock %}
